@@ -1,0 +1,701 @@
+{
+  "aviso": "Datos de ejemplo generados por generar.mjs. No son datos reales de ningún jugador ni de ninguna tienda.",
+  "generadoCon": {
+    "semilla": 2026,
+    "inicio": "2026-11-07T00:00:00.000Z",
+    "catalogo": "catálogo de ejemplo integrado",
+    "juegosEnCatalogo": 30,
+    "particiones": 3
+  },
+  "archivos": {
+    "actividad.jsonl": {
+      "topic": "vidalstore.actividad",
+      "key": "juegoId",
+      "lineas": 3039,
+      "porTipo": {
+        "partida.iniciada": 1382,
+        "logro.desbloqueado": 633,
+        "partida.terminada": 1011,
+        "(json roto)": 10,
+        "(sin tipo)": 3
+      },
+      "porParticionEsperada": [
+        1751,
+        520,
+        768
+      ],
+      "porMinuto": [
+        24,
+        27,
+        49,
+        37,
+        48,
+        45,
+        70,
+        83,
+        79,
+        63,
+        61,
+        63,
+        53,
+        54,
+        50,
+        47,
+        47,
+        38,
+        46,
+        39,
+        34,
+        41,
+        35,
+        28,
+        47,
+        35,
+        41,
+        42,
+        33,
+        31,
+        49,
+        61,
+        78,
+        56,
+        50,
+        31,
+        45,
+        35,
+        39,
+        58,
+        68,
+        61,
+        63,
+        71,
+        80,
+        76,
+        79,
+        60,
+        45,
+        52,
+        53,
+        51,
+        60,
+        44,
+        40,
+        47,
+        51,
+        42,
+        51,
+        53
+      ]
+    },
+    "compras.jsonl": {
+      "topic": "vidalstore.compras",
+      "key": "usuarioSub",
+      "lineas": 401,
+      "porTipo": {
+        "compra.realizada": 384,
+        "(json roto)": 2,
+        "licencia.revocada": 15
+      },
+      "porParticionEsperada": [
+        147,
+        141,
+        113
+      ],
+      "porMinuto": [
+        16,
+        22,
+        16,
+        16,
+        22,
+        21,
+        8,
+        16,
+        7,
+        9,
+        8,
+        7,
+        4,
+        11,
+        6,
+        3,
+        1,
+        3,
+        3,
+        3,
+        2,
+        6,
+        4,
+        5,
+        3,
+        2,
+        2,
+        1,
+        2,
+        3,
+        7,
+        6,
+        5,
+        0,
+        2,
+        2,
+        7,
+        11,
+        7,
+        12,
+        11,
+        10,
+        11,
+        14,
+        8,
+        8,
+        9,
+        6,
+        3,
+        2,
+        3,
+        3,
+        6,
+        1,
+        2,
+        1,
+        3,
+        6,
+        3,
+        0
+      ]
+    }
+  },
+  "anomalias": {
+    "particionCaliente": {
+      "juegoId": "292030",
+      "eventosEnActividad": 1229,
+      "participacionPct": 40.4,
+      "particionEsperada": 0
+    },
+    "rafagaDeErrores": {
+      "juegoId": "1328670",
+      "minutos": "30 a 35",
+      "desde": "2026-11-07T00:30:00.000Z",
+      "hasta": "2026-11-07T00:35:00.000Z",
+      "terminadas": 69,
+      "enError": 68,
+      "porcentaje": 98.6
+    },
+    "partidasTerminadas": {
+      "total": 1001,
+      "enError": 81,
+      "porcentaje": 8.1
+    },
+    "ventanasDe5MinutosSobre20Pct": [
+      {
+        "juegoId": "1328670",
+        "minutos": "30 a 35",
+        "desde": "2026-11-07T00:30:00.000Z",
+        "hasta": "2026-11-07T00:35:00.000Z",
+        "terminadas": 69,
+        "enError": 68,
+        "porcentaje": 98.6
+      },
+      {
+        "juegoId": "2379780",
+        "minutos": "5 a 10",
+        "desde": "2026-11-07T00:05:00.000Z",
+        "hasta": "2026-11-07T00:10:00.000Z",
+        "terminadas": 1,
+        "enError": 1,
+        "porcentaje": 100
+      },
+      {
+        "juegoId": "1203220",
+        "minutos": "35 a 40",
+        "desde": "2026-11-07T00:35:00.000Z",
+        "hasta": "2026-11-07T00:40:00.000Z",
+        "terminadas": 2,
+        "enError": 1,
+        "porcentaje": 50
+      },
+      {
+        "juegoId": "1203220",
+        "minutos": "40 a 45",
+        "desde": "2026-11-07T00:40:00.000Z",
+        "hasta": "2026-11-07T00:45:00.000Z",
+        "terminadas": 2,
+        "enError": 1,
+        "porcentaje": 50
+      },
+      {
+        "juegoId": "1145360",
+        "minutos": "55 a 60",
+        "desde": "2026-11-07T00:55:00.000Z",
+        "hasta": "2026-11-07T01:00:00.000Z",
+        "terminadas": 1,
+        "enError": 1,
+        "porcentaje": 100
+      }
+    ],
+    "revocaciones": 15,
+    "invalidos": [
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "b6aa0890-1d2d-47c4-861a-55b21835b02c",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          1893
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": null,
+        "falla": "campo-faltante",
+        "detalle": "falta eventoId",
+        "lineas": [
+          64
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "7819e069-acdf-46e7-9c35-f5229d7f711d",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          1455
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "82ab13b6-227e-456e-9a3d-0d33b4213de6",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          634
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "e006f860-f96e-456a-8a8d-5c3c5efda15e",
+        "falla": "campo-faltante",
+        "detalle": "falta tipo",
+        "lineas": [
+          2018
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "e6463efe-1ca1-4ce3-ba49-be3a6ebe0488",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          2373
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "fc679a8b-b210-429c-b249-94784ad7be9c",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          453
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "428636ff-4de8-4fea-bba3-d0631198da4e",
+        "falla": "campo-faltante",
+        "detalle": "falta emitidoEn",
+        "lineas": [
+          255
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "0013efd5-695f-40a6-84a8-d4c0a18738da",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          143
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "d25b357f-fb96-4563-880c-8447e33e433b",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          2347
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "d4f8075e-e3c3-4335-9209-44ce37d523ad",
+        "falla": "campo-faltante",
+        "detalle": "falta version",
+        "lineas": [
+          1860
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "ce3f9b9f-bca3-4104-9aa3-331738b5f88f",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          609
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "654048a7-44a9-47c9-b22c-691010daaed2",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          767
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": null,
+        "falla": "campo-faltante",
+        "detalle": "falta eventoId",
+        "lineas": [
+          290
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "f6478e09-3d5f-483a-a856-e76a483f4c86",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          807
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "f0cb1bf7-6706-4568-86a5-5bddf2f80d9f",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          1562
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "66b2e7c1-6160-46ea-a969-304be3bc226b",
+        "falla": "campo-faltante",
+        "detalle": "falta tipo",
+        "lineas": [
+          1311
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "3a8d9bc2-7035-406b-ba7f-4b1012440617",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          2000
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "cfebd73d-7c61-4869-ae8a-475744553bf3",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          2440
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "6df6abe3-3455-4cac-afcd-541bad5522c4",
+        "falla": "campo-faltante",
+        "detalle": "falta emitidoEn",
+        "lineas": [
+          2220
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "e4d655a2-e6d5-4f4e-a007-5062f9b1a433",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          2205
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "bfa775bf-6b1e-4f84-9fe4-6ffd37b01774",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          1139
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "1128bdea-e99a-4f4e-8f16-b52e444c3f44",
+        "falla": "campo-faltante",
+        "detalle": "falta version",
+        "lineas": [
+          629
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "e144c001-7bcc-488e-9b9c-2a112a0c94d1",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          1945
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "74618d91-ed90-495b-b6a3-816e280ad4ad",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          127
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": null,
+        "falla": "campo-faltante",
+        "detalle": "falta eventoId",
+        "lineas": [
+          2691
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "aa219b1d-1f2b-45b6-a465-5acccc896846",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          2995
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "5ae4da4f-48d3-4490-ba25-7897b428d37e",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          267
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "b364a171-a913-4df5-85d8-d6e9ddbef3a3",
+        "falla": "campo-faltante",
+        "detalle": "falta tipo",
+        "lineas": [
+          296
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "57d629de-38bb-445a-8a98-3ee622bd401d",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          2945
+        ]
+      },
+      {
+        "archivo": "compras.jsonl",
+        "eventoId": "2e1326fc-05ac-4da5-8b65-3288ac1527a2",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          79
+        ]
+      },
+      {
+        "archivo": "compras.jsonl",
+        "eventoId": null,
+        "falla": "campo-faltante",
+        "detalle": "falta eventoId",
+        "lineas": [
+          73
+        ]
+      },
+      {
+        "archivo": "compras.jsonl",
+        "eventoId": "a248875d-2441-4e83-8127-8d1333fbc475",
+        "falla": "version-99",
+        "detalle": "version 99, desconocida para el consumidor",
+        "lineas": [
+          187
+        ]
+      },
+      {
+        "archivo": "compras.jsonl",
+        "eventoId": "3b25f439-c62e-4b02-a36a-7cee04b03174",
+        "falla": "json-roto",
+        "detalle": "el value se corta a la mitad y no parsea",
+        "lineas": [
+          34
+        ]
+      }
+    ],
+    "duplicados": [
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "28df6114-ac9e-4b87-8104-f7c1a7559466",
+        "tipo": "partida.terminada",
+        "lineas": [
+          1674,
+          1692
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "213055b0-8728-455c-9077-4e8d45595ced",
+        "tipo": "partida.iniciada",
+        "lineas": [
+          209,
+          217
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "686a068a-b7f7-48fa-b49a-b4dac5c967bc",
+        "tipo": "partida.terminada",
+        "lineas": [
+          1141,
+          1156
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "4e421e6d-482f-4fe3-952b-e9155f201307",
+        "tipo": "partida.iniciada",
+        "lineas": [
+          320,
+          358
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "a443a438-27ee-4215-a77e-41dd9273906d",
+        "tipo": "partida.iniciada",
+        "lineas": [
+          466,
+          481
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "0027bf70-539e-423e-b657-8646b684671e",
+        "tipo": "partida.iniciada",
+        "lineas": [
+          97,
+          102
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "04f20ed5-5afe-4204-afe7-0e20c9966f0b",
+        "tipo": "partida.iniciada",
+        "lineas": [
+          93,
+          108
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "977e5623-6eb9-4d3a-bb59-2b8e524ee832",
+        "tipo": "partida.iniciada",
+        "lineas": [
+          460,
+          475
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "09107185-d339-47a0-a058-7cd9df4f8b6b",
+        "tipo": "partida.iniciada",
+        "lineas": [
+          2878,
+          2901
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "321057ed-015c-40c0-9119-62b448c77947",
+        "tipo": "partida.iniciada",
+        "lineas": [
+          1409,
+          1422
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "35bd6379-3c1b-43a7-9901-e9ba941c4737",
+        "tipo": "partida.terminada",
+        "lineas": [
+          929,
+          939
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "1660ae35-679e-44f9-914c-9aaf5e9205b1",
+        "tipo": "partida.terminada",
+        "lineas": [
+          1178,
+          1192
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "cf3b2af6-caf8-4d55-8e57-51901574bc2d",
+        "tipo": "partida.terminada",
+        "lineas": [
+          1032,
+          1043
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "96d11be7-df39-44d0-9289-ba70bbd61f03",
+        "tipo": "logro.desbloqueado",
+        "lineas": [
+          2204,
+          2244
+        ]
+      },
+      {
+        "archivo": "actividad.jsonl",
+        "eventoId": "7d861bb7-5316-49e2-a794-d814b8a1bf63",
+        "tipo": "partida.terminada",
+        "lineas": [
+          2368,
+          2391
+        ]
+      },
+      {
+        "archivo": "compras.jsonl",
+        "eventoId": "8045c8ca-b3d2-4aab-9608-8c4320177c1c",
+        "tipo": "compra.realizada",
+        "lineas": [
+          243,
+          245
+        ]
+      },
+      {
+        "archivo": "compras.jsonl",
+        "eventoId": "563045c5-7789-49e9-88c1-d703ba99f0b1",
+        "tipo": "compra.realizada",
+        "lineas": [
+          257,
+          261
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "vidalstore-simulador",
+  "version": "1.0.0",
+  "description": "Genera y reproduce el dataset de muestra de la EP3 de DSY1107 (venta de verano de VidalStore)",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.6.0"
+  },
+  "scripts": {
+    "generar": "node generar.mjs",
+    "reproducir": "node reproducir.mjs"
+  },
+  "dependencies": {
+    "@platformatic/kafka": "2.14.0"
+  }
+}
