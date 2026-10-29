@@ -33,7 +33,8 @@ carpeta-del-grupo/
 | `dataset/actividad.jsonl` | 3.039 mensajes para `vidalstore.actividad`, uno por línea |
 | `dataset/compras.jsonl` | 401 mensajes para `vidalstore.compras` |
 | `dataset/resumen.json` | Las cifras esperadas y cada anomalía con su `eventoId` y su línea |
-| `reproducir.mjs` | Publica el dataset en Kafka respetando los tiempos |
+| `reproducir.mjs` | Publica el dataset en Kafka respetando los tiempos, y explica cualquier falla |
+| `.env.example` | Todas las variables del simulador, comentadas, para copiar como `.env` |
 | `generar.mjs` | Vuelve a escribir el dataset; solo hace falta para usar el catálogo del grupo |
 
 El dataset ya viene generado con la semilla 2026 y 30 juegos de ejemplo. **No hace falta correr
@@ -91,10 +92,35 @@ node reproducir.mjs --solo compras     # solo un topic: actividad o compras
 ```
 
 `--velocidad 60` es la que se usa para mirar el panel: cada minuto de la noche dura un segundo, y
-la ventana de 5 minutos de la alerta se ve en 5 segundos. Mientras corre, muestra el avance cada 500
-mensajes, y al final cuántos confirmó el clúster por topic.
+la ventana de 5 minutos de la alerta se ve en 5 segundos. Al partir muestra con qué valores corre y
+de dónde salió cada uno; mientras corre, el avance cada 500 mensajes; y al final, cuántos confirmó el
+clúster por topic.
 
-## 1.5 Comprobar que llegó todo
+Otras formas útiles (todas las opciones están en la sección 4):
+
+```bash
+node reproducir.mjs --seco                           # valida todo sin conectarse a Kafka
+node reproducir.mjs --desde 30 --hasta 35            # solo la ráfaga de errores
+node reproducir.mjs --sin-invalidos --sin-duplicados # solo eventos buenos
+node reproducir.mjs --repetir 5 --velocidad 600      # carga sostenida, para ver el lag
+node reproducir.mjs --ayuda                          # todas las opciones
+```
+
+## 1.5 Variables y archivo `.env`
+
+Cada opción tiene su variable de entorno con el prefijo `SIM_`: `--velocidad` es `SIM_VELOCIDAD`,
+`--brokers` es `SIM_BROKERS`. Para no escribirlas cada vez, se copia `.env.example` como `.env` en la
+carpeta del simulador y se descomentan las que se quieran cambiar. Si una opción aparece en más de un
+lugar, gana la línea de comandos, después la variable y al final el valor por defecto.
+
+```bash
+cp .env.example .env               # y editar, por ejemplo SIM_VELOCIDAD=600
+SIM_SOLO=compras node reproducir.mjs   # o una variable solo para esa ejecución
+```
+
+`.env` no se versiona (está en `.gitignore`).
+
+## 1.6 Comprobar que llegó todo
 
 Con el clúster recién levantado, los topics vacíos y **una sola** reproducción:
 
@@ -120,19 +146,19 @@ docker compose exec -T broker-1 /opt/kafka/bin/kafka-get-offsets.sh \
 # vidalstore.actividad:2:768
 ```
 
-## 1.6 Volver a empezar
+## 1.7 Volver a empezar
 
 Cada corrida vuelve a publicar todo. Kafka no descarta lo repetido: el log crece y los consumidores
 reciben los mismos `eventoId` otra vez. Hay dos formas de repetir una demostración:
 
 - **Partir de cero**, borrando también lo que había en Kafka. En `vidalstore-plataforma`:
   `docker compose down -v`, luego `docker compose up -d --wait` y `sh kafka/topics.sh`. Los offsets
-  vuelven a las cifras de 1.5.
+  vuelven a las cifras de 1.6.
 - **Sin bajar el clúster**, desde la E2: se vacían las tablas de lectura (`TRUNCATE kpi_minuto,
   alertas, ventas_semana`, más `eventos_procesados` si existe) y se vuelve a reproducir. Los offsets
   se duplican, pero el panel parte de cero porque los consumidores son idempotentes.
 
-## 1.7 Con el catálogo del grupo (opcional)
+## 1.8 Con el catálogo del grupo (opcional)
 
 Con el JSON del catálogo del grupo, los `juegoId` del dataset son los que sirve el microservicio de
 catálogo. No resta puntos usar los 30 juegos de ejemplo.
@@ -188,6 +214,10 @@ sudo docker run --rm -v "$PWD":/app -w /app node:24-slim sh -c \
    --brokers 10.0.21.11:9092,10.0.22.12:9092,10.0.21.13:9092"
 ```
 
+Las demás opciones se pasan igual, al final del comando, o como variables con `-e` antes de
+`node:24-slim` (por ejemplo `-e SIM_VELOCIDAD=600`). Un `.env` en `vidalstore-simulador-main` también
+sirve, porque la carpeta se monta en el contenedor.
+
 Las tres IP son las de `mq-1`, `mq-2` y `mq-3` de `docs/red.md`; cada broker escucha en el 9092 de su
 máquina (`network_mode: host`). Si el grupo usó otras IP, se cambian ahí. La primera vez tarda un
 poco más porque descarga la imagen de Node. En el ensayo del curso, desde `gestion`, publicó los
@@ -195,7 +225,7 @@ poco más porque descarga la imagen de Node. En el ensayo del curso, desde `gest
 
 ## 2.4 Con el dataset generado con el catálogo del grupo
 
-El dataset de 1.7 se sube al bucket del grupo desde el equipo y se baja en `gestion`, encima del que
+El dataset de 1.8 se sube al bucket del grupo desde el equipo y se baja en `gestion`, encima del que
 trae el repositorio:
 
 ```bash
@@ -217,7 +247,7 @@ aws ssm start-session --target <id-de-gestion> \
 ```
 
 En `http://localhost:18085` tienen que aparecer los tres brokers de la nube y, con los topics vacíos
-y una sola reproducción, las mismas cifras por partición de 1.5. Desde `mq-1`, con
+y una sola reproducción, las mismas cifras por partición de 1.6. Desde `mq-1`, con
 `kafka-get-offsets.sh` dentro del contenedor del broker, se ve lo mismo en texto.
 
 ## 2.6 En la verificación en vivo y en la defensa
@@ -228,17 +258,90 @@ minuto y la alerta del juego `1328670` aparece entre los segundos 30 y 35, que s
 
 ---
 
-# 3. Problemas frecuentes
+# 3. Si algo se cae
+
+El simulador no termina con un error del cliente de Kafka sin más. Cada problema se muestra igual:
+
+```text
+------------------------------------------------------------------------------
+ERROR · Ningún broker acepta la conexión
+------------------------------------------------------------------------------
+Qué pasó:   En localhost:9092,localhost:9094,localhost:9096 no hay nada escuchando (ECONNREFUSED).
+Por qué:    Los brokers se cayeron mientras se publicaba: se detuvo el compose, Docker se cerró o la
+            máquina se reinició.
+Qué hacer:  1. En vidalstore-plataforma: docker compose up -d --wait
+            2. docker compose ps: los brokers en (healthy)
+            3. Si el grupo cambió los puertos: --brokers con los suyos
+            4. Cuando esté resuelto, seguir desde donde quedó: node reproducir.mjs --desde 10
+Detalle técnico:
+  PLT_KFK_NETWORK: Connection to localhost:9092 failed.
+  ECONNREFUSED: connect ECONNREFUSED 127.0.0.1:9092
+------------------------------------------------------------------------------
+Código de salida 3 (aMitad).
+```
+
+«Qué hacer» se adapta a dónde corre: con brokers en `localhost` da los comandos del equipo, y con IP
+privadas da los de la nube. «Detalle técnico» es lo que respondió Kafka, para buscarlo o para llevarlo
+a la consulta.
+
+## 3.1 Lo que se recupera solo
+
+Si mientras publica se cae un broker, se pierde la conexión o una partición queda sin líder, el
+simulador **no se detiene**: avisa, espera a que el clúster se recupere y vuelve a mandar el lote.
+
+```text
+AVISO · El clúster no tiene réplicas suficientes para confirmar
+  Los brokers rechazan la escritura: quedan menos de 2 réplicas al día (NOT_ENOUGH_REPLICAS).
+  Se espera 10 s a que el clúster se recupere y se vuelve a mandar el lote (intento 1 de 3).
+El clúster volvió a confirmar. Se sigue desde 21:11.
+```
+
+Lo hace hasta 3 veces, con 10 segundos entre cada una (`--reintentos-lote` y `--espera-lote`). El tiempo
+esperando no cuenta: la noche sigue desde donde quedó. Probado con dos brokers detenidos durante 30
+segundos a mitad de la hora: el simulador esperó, siguió solo al volver los brokers y terminó con todo
+confirmado.
+
+Al volver a mandar un lote, algún mensaje que alcanzó a guardarse puede quedar dos veces en el log (en
+esa prueba quedó 1 de 3.039). No es un problema: los consumidores de la E2 lo descartan por `eventoId`.
+
+## 3.2 Lo que no se recupera solo
+
+Si después de esos intentos el clúster sigue sin confirmar, o el problema es de configuración, el
+simulador se detiene, muestra cuánto alcanzó a confirmar y **el comando para seguir desde ese minuto**
+con `--desde`. Con Ctrl+C pasa lo mismo: termina el lote en curso, cierra el productor y dice desde
+dónde seguir. Un segundo Ctrl+C sale de inmediato.
+
+El código de salida dice qué tipo de problema fue, por si se usa en un script:
+
+| Código | Significa | Se publicó algo |
+|---|---|---|
+| 0 | Todo confirmado por el clúster | Todo |
+| 1 | Una opción con un valor que no sirve, o el dataset falta o está dañado | Nada |
+| 2 | No se pudo conectar, o faltan los topics | Nada |
+| 3 | Se publicó una parte y el clúster dejó de confirmar | Lo que dice el resumen |
+| 130 | Interrumpido con Ctrl+C | Lo que dice el resumen |
+
+## 3.3 Los casos que reconoce
+
+| Título del error | Cuándo aparece | Lo primero que hay que revisar |
+|---|---|---|
+| Falta un topic en el clúster | No se corrió `topics.sh`, o se hizo `docker compose down -v` | `sh kafka/topics.sh` (en la nube, desde `mq-1`) |
+| Ningún broker acepta la conexión | El clúster no está arriba, está arrancando o usa otros puertos | `docker compose ps` |
+| No se encuentra el nombre de un broker | Se usó `broker-1:19092` desde fuera de Docker | `--brokers localhost:9092,...` en el equipo, IP privadas en la nube |
+| Los brokers no responden a tiempo | En la nube, el Security Group de las `mq` o una IP equivocada; en local, Docker sin memoria | La entrada 9092 desde el Security Group de `gestion` |
+| El clúster no tiene réplicas suficientes | Quedan menos de 2 brokers vivos | Levantar los brokers caídos. Es lo que debe pasar con `acks=all` |
+| Una partición está sin líder | Un broker se cayó y no hay otro elegido todavía | Los 3 controllers y al menos 2 brokers arriba |
+| Se cortó la conexión con un broker | Un broker se reinició o la red se cortó | `docker compose logs broker-1 --tail 30` |
+| Valor no válido para… | Una opción o variable con un valor que no sirve | El mensaje dice cuál, de dónde salió y qué acepta |
+| La línea N de … está dañada | El dataset se editó o la descarga quedó cortada | `git checkout -- dataset/` |
+| Error que el simulador no reconoce | Cualquier otro | El detalle técnico, y llevar la salida a la consulta |
+
+## 3.4 Otros problemas
 
 | Lo que aparece | Qué pasa | Qué hacer |
 |---|---|---|
-| `No existe dataset/actividad.jsonl` | Se corrió fuera de la carpeta del simulador, o `--dataset` apunta a otra | `cd vidalstore-simulador`, o corregir `--dataset` |
-| `Unknown topic vidalstore.actividad` | No se corrió `topics.sh` en ese clúster | Correrlo y volver a reproducir |
-| `connect ECONNREFUSED 127.0.0.1:9092` | El clúster no está arriba o publica otros puertos | `docker compose ps`; si cambiaron los puertos, `--brokers` |
-| `NOT_ENOUGH_REPLICAS` | Quedan menos de 2 brokers vivos: con `acks=all` y `min.insync.replicas=2` el clúster rechaza la escritura | Levantar los brokers caídos. Es el comportamiento esperado |
 | En la nube, `npm ci` no descarga nada | `gestion` no sale a internet | Revisar `nat`, su source/dest check y la ruta de la subred privada |
-| En la nube, un error de conexión o un tiempo de espera agotado | `gestion` no alcanza el 9092 de las `mq` | Revisar el Security Group de las `mq`: tiene que aceptar al de `gestion` |
-| Las cifras de Kafka UI son el doble | Se reprodujo dos veces sobre los mismos topics | Es lo esperado: ver 1.6 |
+| Las cifras de Kafka UI son el doble | Se reprodujo dos veces sobre los mismos topics | Es lo esperado: ver 1.7 |
 | En Git Bash, `/opt/kafka/...` se convierte en `C:/Program Files/Git/opt/...` | Git Bash traduce rutas | `export MSYS_NO_PATHCONV=1` antes del comando |
 
 ---
@@ -247,13 +350,29 @@ minuto y la alerta del juego `1328670` aparece entre los segundos 30 y 35, que s
 
 ## Opciones
 
-| `reproducir.mjs` | Por defecto | Para qué |
-|---|---|---|
-| `--dataset` | `dataset` | Carpeta con los `.jsonl` |
-| `--solo` | los dos | `actividad` o `compras` |
-| `--velocidad` | `60` | Factor sobre el tiempo real. `0` publica sin esperas |
-| `--brokers` | `localhost:9092,localhost:9094,localhost:9096` | Bootstrap del clúster |
-| `--cada` | `500` | Cada cuántos mensajes muestra el avance |
+| `reproducir.mjs` | Variable | Por defecto | Para qué |
+|---|---|---|---|
+| `--brokers` | `SIM_BROKERS` | `localhost:9092,localhost:9094,localhost:9096` | Bootstrap del clúster |
+| `--velocidad` | `SIM_VELOCIDAD` | `60` | Factor sobre el tiempo real. `0` publica sin esperas |
+| `--desde` | `SIM_DESDE` | `0` | Minuto de la noche desde el que se publica (0 = 21:00) |
+| `--hasta` | `SIM_HASTA` | `60` | Minuto hasta el que se publica, sin incluirlo |
+| `--repetir` | `SIM_REPETIR` | `1` | Vueltas seguidas del mismo tramo, para carga sostenida |
+| `--solo` | `SIM_SOLO` | los dos | `actividad` o `compras` |
+| `--sin-invalidos` | `SIM_SIN_INVALIDOS` | `no` | Omite los 34 inválidos puestos a propósito |
+| `--sin-duplicados` | `SIM_SIN_DUPLICADOS` | `no` | Omite los 17 duplicados puestos a propósito |
+| `--topic-actividad` | `SIM_TOPIC_ACTIVIDAD` | `vidalstore.actividad` | Otro topic de destino, para pruebas |
+| `--topic-compras` | `SIM_TOPIC_COMPRAS` | `vidalstore.compras` | Otro topic de destino, para pruebas |
+| `--dataset` | `SIM_DATASET` | `dataset` | Carpeta con los `.jsonl` y `resumen.json` |
+| `--cada` | `SIM_CADA` | `500` | Cada cuántos mensajes muestra el avance |
+| `--timeout-conexion` | `SIM_TIMEOUT_CONEXION` | `5000` | Milisegundos que se espera a que un broker acepte la conexión |
+| `--reintentos` | `SIM_REINTENTOS` | `10` | Reintentos del cliente por envío; cubren la elección de un líder |
+| `--espera-reintento` | `SIM_ESPERA_REINTENTO` | `1000` | Milisegundos entre esos reintentos |
+| `--reintentos-lote` | `SIM_REINTENTOS_LOTE` | `3` | Veces que se espera al clúster y se vuelve a mandar un lote (3.1) |
+| `--espera-lote` | `SIM_ESPERA_LOTE` | `10` | Segundos de cada una de esas esperas |
+| `--client-id` | `SIM_CLIENT_ID` | `vidalstore-simulador` | `client.id` del productor |
+| `--seco` | `SIM_SECO` | `no` | Valida el dataset y las opciones sin conectarse a Kafka |
+
+Los booleanos aceptan `si`, `sí`, `1`, `true` o `no`, `0`, `false`.
 
 | `generar.mjs` | Por defecto | Para qué |
 |---|---|---|
@@ -328,6 +447,7 @@ node reproducir.mjs --solo compras --velocidad 0      # en vidalstore-simulador
 ```
 
 Con un broker caído, los 401 mensajes se confirman y el ISR de cada partición queda con dos brokers.
-Con dos caídos, el productor reintenta 10 veces, una por segundo, y termina con `NOT_ENOUGH_REPLICAS`:
-no se confirma nada que viva en una sola copia. `docker compose up -d --wait` devuelve los brokers y
+Con dos caídos, el clúster responde `NOT_ENOUGH_REPLICAS`: no se confirma nada que viva en una sola
+copia. El simulador avisa y espera a que vuelvan (3.1); si no vuelven, se detiene y dice desde dónde
+seguir. `docker compose up -d --wait` devuelve los brokers y
 el ISR vuelve a tres. En la nube es lo mismo deteniendo Kafka en `mq-2` y `mq-3`.
